@@ -1,12 +1,22 @@
-//COMMENT - // 100% working script with ESP12-F wifi module // TESTED OK // KEYBOARD CW SENDER USING LAPTOP OR SMART PHONE
-// this script written for hamradio project : WIFI CW KEYBOARD BY VU3AVE (ANISH VR , KERALA)
+// Ver. 1.1 AVE RnD CW Keyer (20 / 12 /2022 )
+
+//COMMENT - // 100% working script with ESP12 Wifi Module
+// After uploding this code (.ino) along with index.h - press restart the ESP12 Module
+// Module will Run in AP mode and create a Wifi Hotspot named "92.168.4.1"
+// Log in to that wifi network(no password needed) using a laptop computer or Mobile Smart phone
+// Now , navigate to http://192.168.4.1/ using your web browser
+// Type in English using default keyboard and that will be converted to Telegraphy messages ( via Pin 4)  and send as Tone as well as digital out (via Pin 5)
+
 //KEY_PIN and P_CW are = pin 5 of ESP12 > cw out pin
+// tonepin is pin 4 of ESP12 , this for tone out through external speaker
 
 // EEPROM STORES  time_unit data - millisecond for DIT
-// recalls this data from eeprom to html page
+//  EEPROM also STORES  side tone frequency - hertz for Side tone for telegraphy , though speaker
+
+// On first loading , ESP12 recalls these two data from eeprom to html page for dispaying pre-saved data
+
 // 3 numbers of input fields to type in a set GO the text as CW
-// this script run esp12-f module in AP-Mode only
-// there is no password is set to Join this Access Point (AP)
+
 
 
 #include <EEPROM.h>
@@ -36,11 +46,17 @@ String  morsecode;
 
 String message;
 String dit_time;
+String freq;
+
+
+
  int present_message_length;
  String backup_message;
 String present_message;
 
 
+ int tonepin = 4;
+ int my_tone_frequency = 500;
 
 
 const String  characters = "abcdefghijklmnopqrstuvwxyz1234567890?.,/-; ";
@@ -108,7 +124,7 @@ String mappings[] = {
 
 
 //SSID and Password of your WiFi router
-const char* ssid = "14-dec-2022-5";
+const char* ssid = "92.168.4.1";
 const char* password = "";
 
 ESP8266WebServer server(80); //Server on port 80
@@ -155,6 +171,35 @@ void handleWPMBACK(){
 
 
 
+void handleTONEBACK(){
+  //////// DISPLAY STORED TONE FREQUENCY IN HTML FILE
+  recivedData = read_String(10);
+  Serial.print("Read Data OF WPM FROM 10:");
+  Serial.println(recivedData);
+  delay(1000);
+  server.send(200, "text/plane", recivedData);
+}
+
+
+/////////////////------------
+
+void handleTONETXT(){
+   freq = server.arg("mytxt"); 
+   Serial.println("received frequency  is :");
+    Serial.println(freq );
+     Serial.println("");
+    server.send(200, "text/plane", freq);
+// store eeprom to continue here...  
+data = freq;
+  Serial.print("Writing Data to address 10:");
+  Serial.println(data);
+//WRITING NEW SIDE TONE FREQUENCY DATA (FREQUENCY IN HERTZ) IN EEPROM
+  writeString(10, data);  //Address 10 and String type data
+  delay(10);
+
+  my_tone_frequency = data.toInt(); // CONVERTING STRING TO INT and STORING IN my_tone_frequency (NEW frequency STORED )
+}
+//////////////////---------------
 
 
 
@@ -183,6 +228,8 @@ message="";
 void setup(void){
   pinMode(P_CW, OUTPUT);
   pinMode(KEY_PIN, OUTPUT);
+  pinMode(tonepin, OUTPUT);
+  
   // send the FIRST CHARACTOR ONLY of the subscribed string as cw
  // int result= messagetocw();
 
@@ -205,7 +252,11 @@ void setup(void){
   server.on("/", handleRoot);      //Which routine to handle at root location. This is display page
   server.on("/cwtxt", handleCWTXT);
   server.on("/wpmtxt", handleWPMTXT);
+  server.on("/tonetxt", handleTONETXT);
+  
   server.on("/wpmback", handleWPMBACK);
+  server.on("/toneback", handleTONEBACK);
+
 
   server.begin();                  //Start server
   Serial.println("");
@@ -219,7 +270,7 @@ void setup(void){
 
 
 
-// FSOR FIRST RUN >> WPM VALUE FROM EEPROM TO RUNNING PROGRAMME
+// FOR FIRST RUN >> WPM VALUE FROM EEPROM TO RUNNING PROGRAMME
 // reading eeprom value of TIME_UNIT from address 0, to store in TIME_UNIT
 
   recivedData = read_String(0);
@@ -228,6 +279,22 @@ void setup(void){
   delay(1000);
 if(recivedData.length() >=1){
   TIME_UNIT = recivedData.toInt(); // CONVERTING STRING TO INT and STORING IN TIME_UNIT (NEW WPM STORED )
+}
+// reading eeprom value of TIME_UNIT from address 0, to store in TIME_UNIT
+
+
+
+
+
+// FOR FIRST RUN >> FREQUENCY VALUE FROM EEPROM TO RUNNING PROGRAMME
+// reading eeprom value of my_tone_frequency from address 10, to store in my_tone_frequency
+
+  recivedData = read_String(10);
+  Serial.print("Read Data from address 10 : ");
+  Serial.println(recivedData);
+  delay(1000);
+if(recivedData.length() >=1){
+  my_tone_frequency = recivedData.toInt(); // CONVERTING STRING TO INT and STORING IN my_tone_frequency (NEW SIDE TONE FREQUENCY STORED )
 }
 // reading eeprom value of TIME_UNIT from address 0, to store in TIME_UNIT
 
@@ -384,7 +451,7 @@ last_sent_location=last_sent_location+1;
             digitalWrite(KEY_PIN, HIGH);
 
 
-     //    tone(tonepin, my_tone_frequency);
+        tone(tonepin, my_tone_frequency);
         
         
 
@@ -396,7 +463,7 @@ last_sent_location=last_sent_location+1;
             
             delay(sm_time);
             digitalWrite(KEY_PIN, LOW);
-         //    noTone(tonepin);
+            noTone(tonepin);
             delay(SYMBOL_SPACE);
           }// for loop close2
           
