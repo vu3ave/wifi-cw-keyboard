@@ -1,6 +1,6 @@
 # wifi-cw-keyboard-keyer   for Ham Radio CW operation
 
-Provide 3.3V DC to ESP12 Module
+# Provide 3.3V DC to ESP12 Module
 Keep the two files ( index.h and wifi-keyboard-cw-keyer.ino ) in same folder before uploading to ESP12
 After uploading the sketch, apply reset to ESP12, this will start AP Mode and create WiFi Hotspot named "14-dec-2022-5"
 Join the wifi network using a laptop computer ( or Smart Phone)
