@@ -2,7 +2,7 @@ const char MAIN_page[] PROGMEM = R"=====(
 <!DOCTYPE html>
 <html>
   <head>
-  <title>1.4 - AVE RnD : CW Keyer</title>
+  <title>AVE RnD : CW Keyer Ver 1.1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
   
@@ -287,8 +287,8 @@ document.getElementById('txtcw').focus();
 </div>
 <script>
 function edit_1(){
-	document.getElementById("txtcw").value = document.getElementById("txtcw").value + " " + document.getElementById("edit_txt_1").value;
-	document.getElementById("txtcw").focus();
+  document.getElementById("txtcw").value = document.getElementById("txtcw").value + " " + document.getElementById("edit_txt_1").value;
+  document.getElementById("txtcw").focus();
 }
 </script>
 
@@ -302,8 +302,8 @@ function edit_1(){
 </div>
 <script>
 function edit_2(){
-	document.getElementById("txtcw").value = document.getElementById("txtcw").value + " " + document.getElementById("edit_txt_2").value;
-	document.getElementById("txtcw").focus();
+  document.getElementById("txtcw").value = document.getElementById("txtcw").value + " " + document.getElementById("edit_txt_2").value;
+  document.getElementById("txtcw").focus();
 }
 </script>
 
@@ -315,8 +315,8 @@ function edit_2(){
 </div>
 <script>
 function edit_3(){
-	document.getElementById("txtcw").value = document.getElementById("txtcw").value + " " + document.getElementById("edit_txt_3").value;
-	document.getElementById("txtcw").focus();
+  document.getElementById("txtcw").value = document.getElementById("txtcw").value + " " + document.getElementById("edit_txt_3").value;
+  document.getElementById("txtcw").focus();
 }
 </script>
 
@@ -324,40 +324,62 @@ function edit_3(){
 
 
 <div class="slidecontainer">
-
  <fieldset>
   <legend>Set WPM</legend>
-
-  <input onchange="change_wpm()" oninput="show_sweeped_wpm()" id="speed" type="range" min="50" max="200" value="100" class="slider" >
+  <input onchange="change_wpm()" oninput="show_sweeped_wpm()" id="speed" type="range" min="40" max="150" value="90" class="slider" >
   Change/Set New DIT time : <b><i id="ditime">???</i></b> Milli Second
   <br>
   Saved DIT time : <b><i id="receiptwpm"></i></b> Milli Second
  </fieldset>
+ <p></p>
+ <p></p>
+</div>
 
+<div class="slidecontainer">
+ <fieldset>
+  <legend>Set Side Tone frequency</legend>
+  <input onchange="change_tone()" oninput="show_sweeped_tone()" id="sidetone" type="range" min="50" max="2000" value="500" class="slider" >
+  Change/Set New Side Tone frequecy : <b><i id="side_tone">???</i></b> Hertz
+  <br>
+  Saved Side Tone frequency : <b><i id="receipttone"></i></b> Hertz
+ </fieldset>
+</div>
+
+<script>
+  
+function show_sweeped_wpm(){
+  // only diplay :  instantanious selected values of sweep selector
+document.getElementById("ditime").innerHTML = document.getElementById("speed").value; 
+  
+} 
+
+function show_sweeped_tone(){
+  // only diplay :  instantanious selected values of frequency selector
+document.getElementById("side_tone").innerHTML = document.getElementById("sidetone").value; 
+  
+} 
 
 
   
-</div>
-
-
-
-<script>
-	
-function show_sweeped_wpm(){
-	// only diplay :  instantanious selected values of sweep selector
-document.getElementById("ditime").innerHTML = document.getElementById("speed").value;	
-	
-}	
-	
-		
+    
 function change_wpm(){
-	//up on final select from sweep bar..send and set new wpm in eeprom
+  //up on final select from sweep bar..send and set new wpm in eeprom
 document.getElementById("ditime").innerHTML = document.getElementById("speed").value;
 document.getElementById('txtcw').focus();
 // sending milliseconds value
 sendWpm(document.getElementById("speed").value);
 
 }
+
+function change_tone(){
+  //up on final select from sweep bar..send and set new wpm in eeprom
+document.getElementById("side_tone").innerHTML = document.getElementById("sidetone").value;
+document.getElementById('txtcw').focus();
+// sending frequency value
+ sendTone(document.getElementById("sidetone").value);
+
+}
+
 </script>
 
 
@@ -405,6 +427,23 @@ function sendWpm(txt) {
   xhttp.open("GET", "wpmtxt?mytxt="+txt, true);
   xhttp.send();
 }
+
+
+function sendTone(txt) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("receipttone").innerHTML =
+      this.responseText;
+    }
+  };
+  xhttp.open("GET", "tonetxt?mytxt="+txt, true);
+  xhttp.send();
+}
+
+
+
+
 </script>
 
 
@@ -415,7 +454,7 @@ function sendWpm(txt) {
 // Exicuite the below function after the TIMESET = 5 Seconds // for retriving Saved WPM milliseconds for display purpose
  
  function getSavedWpm(){
-	var xhttp = new XMLHttpRequest();
+  var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       document.getElementById("receiptwpm").innerHTML =
@@ -423,11 +462,33 @@ function sendWpm(txt) {
     }
   };
   xhttp.open("GET", "wpmback?mytxt=1", true);
-  xhttp.send();	 
+  xhttp.send();  
  }
  
  </script>
 
+
+  <script>
+ const myTimeout1 = setTimeout(getSavedTone, 7000);
+
+// Exicuite the below function after the TIMESET = 7 Seconds // for retriving Saved Side tone frequency (Heartz)for display purpose
+ 
+ function getSavedTone(){
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("receipttone").innerHTML =
+      this.responseText;
+    }
+  };
+  xhttp.open("GET", "toneback?mytxt=1", true);
+  xhttp.send();  
+ }
+ 
+ </script>
+<div>
+for comments : <b>vu3ave</b>@gmail.com
+</div>
   </body>
 </html>
 )=====";
