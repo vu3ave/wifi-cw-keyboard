@@ -1,4 +1,7 @@
-# wifi-cw-keyboard-keyer   for Ham Radio CW operation
+# wifi-cw-keyboard-keyer   for Ham Radio CW operation####
+
+
+#### Upload and  RUN "eeprom_clear.ino"  even before uploading the real "wifi-cw-keyer.ino" #####
 
 # Provide 3.3V DC to ESP12 Module
 Keep the two files ( index.h and wifi-keyboard-cw-keyer.ino ) in same folder before uploading to ESP12
