@@ -1,6 +1,13 @@
 // Ver. 1.1 AVE RnD CW Keyer (20 / 12 /2022 )
 
 //COMMENT - // 100% working script with ESP12 Wifi Module
+
+
+
+// Upload and RUN "eeprom_clear.ino" even before uploading the real "wifi-cw-keyer.ino"
+
+
+
 // After uploding this code (.ino) along with index.h - press restart the ESP12 Module
 // Module will Run in AP mode and create a Wifi Hotspot named "92.168.4.1"
 // Log in to that wifi network(no password needed) using a laptop computer or Mobile Smart phone
@@ -124,7 +131,7 @@ String mappings[] = {
 
 
 //SSID and Password of your WiFi router
-const char* ssid = "92.168.4.1";
+const char* ssid = "192.168.4.1";
 const char* password = "";
 
 ESP8266WebServer server(80); //Server on port 80
@@ -279,6 +286,9 @@ void setup(void){
   delay(1000);
 if(recivedData.length() >=1){
   TIME_UNIT = recivedData.toInt(); // CONVERTING STRING TO INT and STORING IN TIME_UNIT (NEW WPM STORED )
+}else{
+
+  TIME_UNIT = 100;
 }
 // reading eeprom value of TIME_UNIT from address 0, to store in TIME_UNIT
 
@@ -295,6 +305,9 @@ if(recivedData.length() >=1){
   delay(1000);
 if(recivedData.length() >=1){
   my_tone_frequency = recivedData.toInt(); // CONVERTING STRING TO INT and STORING IN my_tone_frequency (NEW SIDE TONE FREQUENCY STORED )
+}else {
+
+  my_tone_frequency = 1000;
 }
 // reading eeprom value of TIME_UNIT from address 0, to store in TIME_UNIT
 
