@@ -1,4 +1,4 @@
-# wifi-cw-keyboard-keyer   for Ham Radio CW operation####
+# wifi-cw-keyboard-keyer   for Ham Radio CW operation
 
 [![Uploading Code on ESP12F](https://img.youtube.com/vi/Byko5tJRTlw/0.jpg)](https://www.youtube.com/watch?v=Byko5tJRTlw)
 
